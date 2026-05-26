@@ -1,0 +1,33 @@
+{% extends "layouts/base.html" %}
+{% block title %}Rankings{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-trophy-fill text-gold"></i> RANKINGS</div>
+    <div class="ma-card">
+      <div class="ma-card-header">TOP PLAYERS</div>
+      <table class="ma-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Player</th><th>Gang</th><th>Level</th><th>Wins</th><th>Crime Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in leaderboard %}
+          <tr>
+            <td class="text-muted">{{ entry.rank }}</td>
+            <td><a href="/game/profile/{{ entry.slug }}" class="text-gold">{{ entry.display_name }}</a></td>
+            <td>{% if entry.gang_tag %}<span class="text-muted">[{{ entry.gang_tag }}]</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td><span class="badge" style="background:var(--ma-accent);">{{ entry.level }}</span></td>
+            <td class="text-gold">{{ entry.fights_won }}</td>
+            <td class="text-teal">{{ entry.crime_points }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No players yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

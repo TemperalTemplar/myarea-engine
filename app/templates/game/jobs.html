@@ -1,0 +1,74 @@
+{% extends "layouts/base.html" %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+{% set p = current_user.player %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-briefcase-fill text-accent"></i> JOBS & CRIMES</div>
+    <div class="row g-2">
+      {% for job in jobs %}
+      <div class="col-md-6">
+        <div class="ma-card p-3 {% if p.level < job.min_level %}opacity-50{% endif %}">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <div class="font-display" style="font-size:1.1rem;">{{ job.name }}</div>
+              <span class="badge bg-secondary" style="font-size:0.7rem;">{{ job.category|upper }}</span>
+            </div>
+            <span class="badge" style="background:var(--ma-surface-2);border:1px solid var(--ma-border);font-size:0.75rem;">Lv{{ job.min_level }}+</span>
+          </div>
+          <div class="row g-1 mb-3" style="font-size:0.78rem;">
+            <div class="col-6 text-muted"><i class="bi bi-lightning-fill text-warning"></i> Energy: <span class="text-light">{{ job.energy_cost }}</span></div>
+            <div class="col-6 text-muted"><i class="bi bi-cash text-info"></i> ${{ "{:,}".format(job.cash_min) }}–${{ "{:,}".format(job.cash_max) }}</div>
+            <div class="col-6 text-muted"><i class="bi bi-star text-gold"></i> +{{ job.xp_reward }}xp</div>
+            <div class="col-6 text-muted"><i class="bi bi-check-circle text-success"></i> {{ (job.base_success_rate*100)|int }}% success</div>
+          </div>
+          {% if p.level < job.min_level %}
+            <button class="btn-ma-ghost w-100" disabled>NEED LEVEL {{ job.min_level }}</button>
+          {% elif p.energy < job.energy_cost %}
+            <button class="btn-ma-ghost w-100" disabled>NOT ENOUGH ENERGY</button>
+          {% elif p.in_hospital %}
+            <button class="btn-ma-ghost w-100" disabled>IN HOSPITAL</button>
+          {% else %}
+            <form method="POST" action="/game/jobs/do/{{ job.id }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-primary w-100">COMMIT CRIME</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="ma-card mb-3 p-3">
+      <div class="ma-card-header mb-2">YOUR STATS</div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted">Energy</span><span class="text-warning">{{ p.energy }}/{{ p.energy_max }}</span></div>
+      <div class="ma-stat-bar energy mb-3"><div class="fill" style="width:{{ [(p.energy/p.energy_max*100)|int,100]|min }}%"></div></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Level</span><span>{{ p.level }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Crime Points</span><span class="text-teal">{{ p.crime_points }}</span></div>
+      <div class="d-flex justify-content-between"><span class="text-muted">Cash</span><span class="text-info">${{ "{:,}".format(p.cash) }}</span></div>
+    </div>
+
+    <div class="ma-card">
+      <div class="ma-card-header">RECENT JOBS</div>
+      <div class="p-2">
+        {% for log in recent %}
+        <div class="d-flex justify-content-between py-1" style="border-bottom:1px solid var(--ma-border);font-size:0.78rem;">
+          <span>{{ log.job.name }}</span>
+          {% if log.jailed %}
+            <span class="text-danger">JAILED</span>
+          {% elif log.success %}
+            <span class="text-success">+${{ "{:,}".format(log.cash_earned) }}</span>
+          {% else %}
+            <span class="text-muted">FAILED</span>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="text-muted text-center py-3" style="font-size:0.78rem;">No jobs yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-2">
+    <div class="ma-card p-2">
+      <div class="font-display text-accent mb-2 px-2" style="font-size:1.1rem;">ADMIN</div>
+      {% set links = [
+        ('admin.index',   'bi-speedometer2', 'Dashboard'),
+        ('admin.players', 'bi-people-fill',  'Players'),
+        ('admin.gangs',   'bi-shield-fill',  'Gangs'),
+        ('admin.jobs',    'bi-briefcase-fill','Jobs'),
+        ('admin.items',   'bi-bag-fill',     'Items'),
+        ('admin.properties','bi-building-fill','Properties'),
+      ('admin.notify_all','bi-megaphone-fill','Notify All'),
+      ] %}
+      {% for endpoint, icon, label in links %}
+      <a href="{{ url_for(endpoint) }}"
+         class="d-block px-2 py-1 mb-1 rounded text-decoration-none {{ 'text-light' if request.endpoint == endpoint else 'text-muted' }}"
+         style="{{ 'background:var(--ma-surface-2)' if request.endpoint == endpoint else '' }}">
+        <i class="bi {{ icon }}"></i> {{ label }}
+      </a>
+      {% endfor %}
+      <hr style="border-color:var(--ma-border);">
+      <form method="POST" action="{{ url_for('admin.reseed') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-ma-ghost w-100" style="font-size:0.75rem;"
+          data-confirm="Re-seed all game data?">
+          <i class="bi bi-arrow-repeat"></i> Re-seed Data
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-10">
+    {% block admin_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

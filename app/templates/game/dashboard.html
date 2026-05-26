@@ -1,0 +1,134 @@
+{% extends "layouts/base.html" %}
+{% block title %}Hub{% endblock %}
+{% block content %}
+{% set p = current_user.player %}
+<div class="row g-3">
+
+  <!-- ── Left col: player card ── -->
+  <div class="col-lg-3">
+    <div class="ma-card p-3 mb-3">
+      <div class="text-center mb-3">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--ma-surface-2);border:2px solid var(--ma-accent);display:inline-flex;align-items:center;justify-content:center;font-size:2rem;">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div class="mt-2 font-display" style="font-size:1.3rem;">{{ p.display_name }}</div>
+        {% if p.gang %}<div class="text-muted" style="font-size:0.78rem;">[{{ p.gang.tag }}] {{ p.gang_rank }}</div>{% endif %}
+        <div class="mt-1"><span class="badge" style="background:var(--ma-accent);">LEVEL {{ p.level }}</span></div>
+      </div>
+      <!-- Stat bars -->
+      <div class="mb-2">
+        <div class="d-flex justify-content-between mb-1"><small class="text-muted"><i class="bi bi-lightning-fill text-warning"></i> Energy</small><small>{{ p.energy }}/{{ p.energy_max }}</small></div>
+        <div class="ma-stat-bar energy"><div class="fill" style="width:{{ [(p.energy/p.energy_max*100)|int, 100]|min }}%"></div></div>
+      </div>
+      <div class="mb-2">
+        <div class="d-flex justify-content-between mb-1"><small class="text-muted"><i class="bi bi-shield-fill text-danger"></i> Stamina</small><small>{{ p.stamina }}/{{ p.stamina_max }}</small></div>
+        <div class="ma-stat-bar stamina"><div class="fill" style="width:{{ [(p.stamina/p.stamina_max*100)|int, 100]|min }}%"></div></div>
+      </div>
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1"><small class="text-muted"><i class="bi bi-heart-fill text-success"></i> Health</small><small>{{ p.health }}/{{ p.health_max }}</small></div>
+        <div class="ma-stat-bar health"><div class="fill" style="width:{{ [(p.health/p.health_max*100)|int, 100]|min }}%"></div></div>
+      </div>
+      <hr style="border-color:var(--ma-border)">
+      <div class="row text-center g-0">
+        <div class="col-6"><div class="text-gold font-display" style="font-size:1.1rem;">{{ p.fights_won }}</div><div class="text-muted" style="font-size:0.7rem;">WINS</div></div>
+        <div class="col-6"><div class="text-accent font-display" style="font-size:1.1rem;">{{ p.fights_lost }}</div><div class="text-muted" style="font-size:0.7rem;">LOSSES</div></div>
+      </div>
+    </div>
+
+    <!-- Cash card -->
+    <div class="ma-card p-3">
+      <div class="ma-card-header mb-2">FINANCES</div>
+      <div class="d-flex justify-content-between mb-1">
+        <span class="text-muted"><i class="bi bi-cash"></i> On Hand</span>
+        <span class="text-info">${{ "{:,}".format(p.cash) }}</span>
+      </div>
+      <div class="d-flex justify-content-between">
+        <span class="text-muted"><i class="bi bi-bank"></i> Banked</span>
+        <span class="text-teal">${{ "{:,}".format(p.bank) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Middle col: quick actions ── -->
+  <div class="col-lg-6">
+    <!-- Quick actions grid -->
+    <div class="row g-2 mb-3">
+      <div class="col-6">
+        <a href="/game/jobs" class="ma-card p-3 d-block text-decoration-none" style="border-left:3px solid var(--ma-accent);">
+          <div class="font-display text-accent" style="font-size:1.1rem;"><i class="bi bi-briefcase-fill"></i> JOBS</div>
+          <div class="text-muted" style="font-size:0.78rem;">Commit crimes, earn cash</div>
+          <div class="mt-1 text-warning" style="font-size:0.78rem;"><i class="bi bi-lightning-fill"></i> Costs energy</div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a href="/game/attacks" class="ma-card p-3 d-block text-decoration-none" style="border-left:3px solid #e63946;">
+          <div class="font-display text-accent" style="font-size:1.1rem;"><i class="bi bi-crosshair"></i> ATTACKS</div>
+          <div class="text-muted" style="font-size:0.78rem;">Fight other players</div>
+          <div class="mt-1 text-danger" style="font-size:0.78rem;"><i class="bi bi-shield-fill"></i> Costs stamina</div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a href="/game/properties" class="ma-card p-3 d-block text-decoration-none" style="border-left:3px solid var(--ma-accent-2);">
+          <div class="font-display text-gold" style="font-size:1.1rem;"><i class="bi bi-building-fill"></i> PROPERTIES</div>
+          <div class="text-muted" style="font-size:0.78rem;">Buy properties, earn income</div>
+          <div class="mt-1 text-info" style="font-size:0.78rem;"><i class="bi bi-cash-stack"></i> Passive income</div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a href="/game/items" class="ma-card p-3 d-block text-decoration-none" style="border-left:3px solid var(--ma-accent-3);">
+          <div class="font-display text-teal" style="font-size:1.1rem;"><i class="bi bi-bag-fill"></i> ITEMS</div>
+          <div class="text-muted" style="font-size:0.78rem;">Weapons, armor, vehicles</div>
+          <div class="mt-1 text-success" style="font-size:0.78rem;"><i class="bi bi-plus-circle"></i> Boost stats</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent notifications -->
+    <div class="ma-card">
+      <div class="ma-card-header">RECENT ACTIVITY</div>
+      <div class="p-3">
+        {% if notifications %}
+          {% for n in notifications %}
+          <div class="d-flex gap-2 mb-2 pb-2" style="border-bottom:1px solid var(--ma-border);">
+            <i class="bi bi-{{ 'crosshair text-danger' if n.type == 'attack' else 'building text-gold' if n.type == 'property' else 'bell text-muted' }}"></i>
+            <div>
+              <div style="font-size:0.82rem;">{{ n.title }}</div>
+              <div class="text-muted" style="font-size:0.75rem;">{{ n.message }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-muted text-center py-3" style="font-size:0.82rem;">No recent activity. Get out there and make some moves.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right col: leaderboard ── -->
+  <div class="col-lg-3">
+    <div class="ma-card">
+      <div class="ma-card-header"><i class="bi bi-trophy-fill text-gold"></i> TOP PLAYERS</div>
+      <div class="p-2">
+        {% if leaderboard %}
+          {% for entry in leaderboard[:10] %}
+          <div class="d-flex justify-content-between align-items-center py-1" style="border-bottom:1px solid var(--ma-border);font-size:0.78rem;">
+            <div>
+              <span class="text-muted me-1">#{{ entry.rank }}</span>
+              <span>{{ entry.display_name }}</span>
+              {% if entry.gang_tag %}<span class="text-muted"> [{{ entry.gang_tag }}]</span>{% endif %}
+            </div>
+            <span class="text-gold">Lv{{ entry.level }}</span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-muted text-center py-3" style="font-size:0.78rem;">No players yet.</div>
+        {% endif %}
+        <div class="text-center mt-2">
+          <a href="{{ url_for('game.leaderboard') }}" class="text-gold" style="font-size:0.78rem;">View full rankings →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

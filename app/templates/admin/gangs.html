@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% block title %}Gangs — Admin{% endblock %}
+{% block admin_content %}
+<div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-shield-fill text-accent"></i> GANGS</div>
+<div class="ma-card">
+  <table class="ma-table">
+    <thead><tr><th>Name</th><th>Tag</th><th>Leader</th><th>Members</th><th>Territory</th><th>Bank</th><th>Created</th><th></th></tr></thead>
+    <tbody>
+      {% for gang in pagination.items %}
+      <tr>
+        <td class="text-gold">{{ gang.name }}</td>
+        <td><span class="badge" style="background:var(--ma-accent);">[{{ gang.tag }}]</span></td>
+        <td class="text-muted">{{ gang.leader.display_name if gang.leader else '—' }}</td>
+        <td>{{ gang.member_count }}</td>
+        <td class="text-teal">{{ gang.territory_points }}</td>
+        <td class="text-gold">${{ "{:,}".format(gang.bank) }}</td>
+        <td class="text-muted" style="font-size:0.75rem;">{{ gang.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('admin.delete_gang', gang_id=gang.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;color:var(--ma-accent);"
+              data-confirm="Delete gang {{ gang.name }}? All members will be removed.">DEL</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if pagination.pages > 1 %}
+  <div class="d-flex justify-content-center gap-2 p-3">
+    {% if pagination.has_prev %}<a href="?page={{ pagination.prev_num }}" class="btn-ma-ghost" style="padding:0.2rem 0.6rem;">←</a>{% endif %}
+    <span class="text-muted" style="padding:0.2rem 0.6rem;">{{ pagination.page }}/{{ pagination.pages }}</span>
+    {% if pagination.has_next %}<a href="?page={{ pagination.next_num }}" class="btn-ma-ghost" style="padding:0.2rem 0.6rem;">→</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

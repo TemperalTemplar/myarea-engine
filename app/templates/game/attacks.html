@@ -1,0 +1,80 @@
+{% extends "layouts/base.html" %}
+{% block title %}Attacks{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-crosshair text-accent"></i> ATTACK</div>
+    {% if player.in_hospital %}
+    <div class="alert" style="background:var(--ma-surface-2);border:1px solid var(--ma-accent);color:var(--ma-text);">
+      <i class="bi bi-hospital text-danger"></i> You are in the hospital and cannot fight.
+      {% if player.hospital_release_at %}
+      Released at: {{ player.hospital_release_at.strftime('%H:%M UTC') }}
+      {% endif %}
+    </div>
+    {% endif %}
+    <div class="ma-card mb-3">
+      <div class="ma-card-header">TARGETS NEAR YOUR LEVEL</div>
+      <table class="ma-table">
+        <thead><tr><th>Player</th><th>Level</th><th>Gang</th><th>Wins</th><th>Attack</th><th>Defense</th><th></th></tr></thead>
+        <tbody>
+          {% for target in targets %}
+          <tr>
+            <td><a href="/game/profile/{{ target.slug }}" class="text-gold">{{ target.display_name }}</a></td>
+            <td><span class="badge" style="background:var(--ma-accent);">{{ target.level }}</span></td>
+            <td>{% if target.gang %}<span class="text-muted">[{{ target.gang.tag }}]</span>{% else %}—{% endif %}</td>
+            <td class="text-gold">{{ target.fights_won }}</td>
+            <td class="text-accent">{{ target.attack_power }}</td>
+            <td class="text-teal">{{ target.defense_power }}</td>
+            <td>
+              {% if not player.in_hospital and player.stamina > 0 %}
+              <form method="POST" action="/game/attacks/attack/{{ target.id }}" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-ma-primary" style="padding:0.2rem 0.8rem;font-size:0.85rem;"
+                  data-confirm="Attack {{ target.display_name }}?">ATTACK</button>
+              </form>
+              {% else %}
+              <button class="btn-ma-ghost" style="padding:0.2rem 0.8rem;font-size:0.85rem;" disabled>—</button>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No targets available near your level.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="ma-card mb-3 p-3">
+      <div class="ma-card-header mb-2">YOUR COMBAT STATS</div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted">Stamina</span><span class="text-danger">{{ player.stamina }}/{{ player.stamina_max }}</span></div>
+      <div class="ma-stat-bar stamina mb-3"><div class="fill" style="width:{{ [(player.stamina/player.stamina_max*100)|int,100]|min }}%"></div></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Attack Power</span><span class="text-accent">{{ player.attack_power }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Defense Power</span><span class="text-teal">{{ player.defense_power }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Fights Won</span><span class="text-gold">{{ player.fights_won }}</span></div>
+      <div class="d-flex justify-content-between"><span class="text-muted">Fights Lost</span><span class="text-danger">{{ player.fights_lost }}</span></div>
+    </div>
+
+    <div class="ma-card">
+      <div class="ma-card-header">RECENT FIGHTS</div>
+      <div class="p-2">
+        {% for log in recent %}
+        <div class="py-1" style="border-bottom:1px solid var(--ma-border);font-size:0.78rem;">
+          {% if log.attacker_id == player.id %}
+            <span class="text-muted">You attacked</span> <a href="/game/profile/{{ log.defender.slug }}" class="text-gold">{{ log.defender.display_name }}</a>
+            — <span class="{{ 'text-success' if log.attacker_won else 'text-danger' }}">{{ 'WON' if log.attacker_won else 'LOST' }}</span>
+            {% if log.cash_stolen %}<span class="text-info"> +${{ "{:,}".format(log.cash_stolen) }}</span>{% endif %}
+          {% else %}
+            <a href="/game/profile/{{ log.attacker.slug }}" class="text-gold">{{ log.attacker.display_name }}</a> <span class="text-muted">attacked you</span>
+            — <span class="{{ 'text-danger' if log.attacker_won else 'text-success' }}">{{ 'LOST' if log.attacker_won else 'DEFENDED' }}</span>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="text-muted text-center py-3" style="font-size:0.78rem;">No fights yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

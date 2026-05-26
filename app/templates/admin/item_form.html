@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ action }} Item — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;">{{ action|upper }} ITEM</div>
+  <a href="{{ url_for('admin.items') }}" class="text-muted" style="font-size:0.82rem;">← Back</a>
+</div>
+<div class="row justify-content-start"><div class="col-lg-8"><div class="ma-card p-4">
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="row g-3">
+<div class="col-md-6"><label class="form-label text-muted">Name *</label><input type="text" name="name" class="form-control bg-dark border-secondary text-light" value="{{ item.name if item else '' }}" required></div>
+<div class="col-md-3"><label class="form-label text-muted">Category *</label><input type="text" name="category" class="form-control bg-dark border-secondary text-light" value="{{ item.category if item else '' }}" required placeholder="weapon, armor, relic..."></div>
+<div class="col-md-3"><label class="form-label text-muted">Rarity</label><select name="rarity" class="form-select bg-dark border-secondary text-light">{% for r in ['common','uncommon','rare','epic','legendary'] %}<option value="{{ r }}" {{ 'selected' if item and item.rarity == r else '' }}>{{ r|title }}</option>{% endfor %}</select></div>
+<div class="col-12"><label class="form-label text-muted">Description</label><textarea name="description" class="form-control bg-dark border-secondary text-light" rows="2">{{ item.description or '' if item else '' }}</textarea></div>
+<div class="col-md-6"><label class="form-label text-muted">Buy Price (blank = not in shop)</label><input type="number" name="buy_price" class="form-control bg-dark border-secondary text-light" value="{{ item.buy_price if item and item.buy_price else '' }}"></div>
+<div class="col-md-6"><label class="form-label text-muted">Sell Price</label><input type="number" name="sell_price" class="form-control bg-dark border-secondary text-light" value="{{ item.sell_price if item and item.sell_price else '' }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Attack Bonus</label><input type="number" name="attack_bonus" class="form-control bg-dark border-secondary text-light" value="{{ item.attack_bonus if item else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Defense Bonus</label><input type="number" name="defense_bonus" class="form-control bg-dark border-secondary text-light" value="{{ item.defense_bonus if item else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Health Bonus</label><input type="number" name="health_bonus" class="form-control bg-dark border-secondary text-light" value="{{ item.health_bonus if item else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Energy Bonus</label><input type="number" name="energy_bonus" class="form-control bg-dark border-secondary text-light" value="{{ item.energy_bonus if item else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Stamina Bonus</label><input type="number" name="stamina_bonus" class="form-control bg-dark border-secondary text-light" value="{{ item.stamina_bonus if item else 0 }}"></div>
+<div class="col-md-4"><div class="form-check mt-4"><input type="checkbox" class="form-check-input" name="is_consumable" {{ 'checked' if item and item.is_consumable else '' }}><label class="form-check-label text-muted">Consumable</label></div></div>
+<div class="col-md-4"><label class="form-label text-muted">Health Restore</label><input type="number" name="health_restore" class="form-control bg-dark border-secondary text-light" value="{{ item.health_restore if item else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Energy Restore</label><input type="number" name="energy_restore" class="form-control bg-dark border-secondary text-light" value="{{ item.energy_restore if item else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Stamina Restore</label><input type="number" name="stamina_restore" class="form-control bg-dark border-secondary text-light" value="{{ item.stamina_restore if item else 0 }}"></div>
+</div>
+<div class="d-flex gap-2 mt-4"><button type="submit" class="btn-ma-primary flex-fill">{{ action|upper }}</button><a href="{{ url_for('admin.items') }}" class="btn-ma-ghost flex-fill text-center">CANCEL</a></div>
+</form></div></div></div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ action }} Job{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;">{{ action|upper }} JOB</div>
+  <a href="{{ url_for('admin.jobs') }}" class="text-muted">← Back</a>
+</div>
+<div class="col-lg-7"><div class="ma-card p-4">
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="row g-3">
+<div class="col-md-8"><label class="form-label text-muted">Name</label><input type="text" name="name" class="form-control bg-dark border-secondary text-light" value="{{ job.name if job else '' }}" required></div>
+<div class="col-md-4"><label class="form-label text-muted">Category</label><input type="text" name="category" class="form-control bg-dark border-secondary text-light" value="{{ job.category if job else '' }}" required placeholder="crime, hunt, ritual"></div>
+<div class="col-md-4"><label class="form-label text-muted">Min Level</label><input type="number" name="min_level" class="form-control bg-dark border-secondary text-light" value="{{ job.min_level if job else 1 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Energy Cost</label><input type="number" name="energy_cost" class="form-control bg-dark border-secondary text-light" value="{{ job.energy_cost if job else 5 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">XP</label><input type="number" name="xp_reward" class="form-control bg-dark border-secondary text-light" value="{{ job.xp_reward if job else 10 }}"></div>
+<div class="col-md-6"><label class="form-label text-muted">Cash Min</label><input type="number" name="cash_min" class="form-control bg-dark border-secondary text-light" value="{{ job.cash_min if job else 100 }}"></div>
+<div class="col-md-6"><label class="form-label text-muted">Cash Max</label><input type="number" name="cash_max" class="form-control bg-dark border-secondary text-light" value="{{ job.cash_max if job else 500 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Crime Points</label><input type="number" name="crime_points" class="form-control bg-dark border-secondary text-light" value="{{ job.crime_points if job else 1 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Success (0-1)</label><input type="number" name="base_success_rate" class="form-control bg-dark border-secondary text-light" value="{{ job.base_success_rate if job else 0.8 }}" step="0.01"></div>
+<div class="col-md-4"><label class="form-label text-muted">Jail (secs)</label><input type="number" name="jail_time_seconds" class="form-control bg-dark border-secondary text-light" value="{{ job.jail_time_seconds if job else 120 }}"></div>
+</div>
+<div class="d-flex gap-2 mt-4"><button type="submit" class="btn-ma-primary flex-fill">{{ action|upper }}</button><a href="{{ url_for('admin.jobs') }}" class="btn-ma-ghost flex-fill text-center">CANCEL</a></div>
+</form></div></div>
+{% endblock %}

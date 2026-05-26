@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Items — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;"><i class="bi bi-bag-fill text-teal"></i> ITEMS</div>
+  <a href="{{ url_for('admin.item_new') }}" class="btn-ma-primary"><i class="bi bi-plus-lg"></i> NEW ITEM</a>
+</div>
+<div class="ma-card">
+  <table class="ma-table">
+    <thead><tr><th>Name</th><th>Type</th><th>Rarity</th><th>Buy</th><th>Bonuses</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td><span class="badge bg-secondary">{{ item.category }}</span></td>
+        <td><span class="rarity-{{ item.rarity }}">{{ item.rarity }}</span></td>
+        <td class="text-info" style="font-size:0.75rem;">${{ "{:,}".format(item.buy_price) if item.buy_price else '—' }}</td>
+        <td style="font-size:0.75rem;">
+          {% if item.attack_bonus %}<span class="text-accent">ATK+{{ item.attack_bonus }}</span> {% endif %}
+          {% if item.defense_bonus %}<span class="text-teal">DEF+{{ item.defense_bonus }}</span> {% endif %}
+          {% if item.health_restore %}<span class="text-success">HP+{{ item.health_restore }}</span> {% endif %}
+          {% if item.energy_restore %}<span class="text-warning">EN+{{ item.energy_restore }}</span> {% endif %}
+          {% if not item.attack_bonus and not item.defense_bonus and not item.health_restore and not item.energy_restore %}—{% endif %}
+        </td>
+        <td>{% if item.is_active %}<span class="badge bg-success">ON</span>{% else %}<span class="badge bg-secondary">OFF</span>{% endif %}</td>
+        <td>
+          <div class="d-flex gap-1">
+            <a href="{{ url_for('admin.item_edit', item_id=item.id) }}" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;">EDIT</a>
+            <form method="POST" action="{{ url_for('admin.toggle_item', item_id=item.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;">{{ 'OFF' if item.is_active else 'ON' }}</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.item_delete', item_id=item.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;color:var(--ma-accent);"
+                data-confirm="Delete '{{ item.name }}'?">DEL</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

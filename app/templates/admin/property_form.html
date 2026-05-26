@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ action }} Property — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;">{{ action|upper }} PROPERTY</div>
+  <a href="{{ url_for('admin.properties') }}" class="text-muted" style="font-size:0.82rem;">← Back</a>
+</div>
+<div class="row justify-content-start"><div class="col-lg-7"><div class="ma-card p-4">
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="row g-3">
+<div class="col-md-8"><label class="form-label text-muted">Name *</label><input type="text" name="name" class="form-control bg-dark border-secondary text-light" value="{{ prop.name if prop else '' }}" required></div>
+<div class="col-md-4"><label class="form-label text-muted">Category *</label><input type="text" name="category" class="form-control bg-dark border-secondary text-light" value="{{ prop.category if prop else '' }}" required placeholder="criminal, business, lair..."></div>
+<div class="col-12"><label class="form-label text-muted">Description</label><textarea name="description" class="form-control bg-dark border-secondary text-light" rows="2">{{ prop.description or '' if prop else '' }}</textarea></div>
+<div class="col-md-4"><label class="form-label text-muted">Buy Price ($) *</label><input type="number" name="purchase_price" class="form-control bg-dark border-secondary text-light" value="{{ prop.purchase_price if prop else 10000 }}" required></div>
+<div class="col-md-4"><label class="form-label text-muted">Sell Price ($) *</label><input type="number" name="sell_price" class="form-control bg-dark border-secondary text-light" value="{{ prop.sell_price if prop else 7000 }}" required></div>
+<div class="col-md-4"><label class="form-label text-muted">Income / Hour ($)</label><input type="number" name="income_per_hour" class="form-control bg-dark border-secondary text-light" value="{{ prop.income_per_hour if prop else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Attack Bonus</label><input type="number" name="attack_bonus" class="form-control bg-dark border-secondary text-light" value="{{ prop.attack_bonus if prop else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Defense Bonus</label><input type="number" name="defense_bonus" class="form-control bg-dark border-secondary text-light" value="{{ prop.defense_bonus if prop else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Energy Bonus</label><input type="number" name="energy_bonus" class="form-control bg-dark border-secondary text-light" value="{{ prop.energy_bonus if prop else 0 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Min Level</label><input type="number" name="min_level" class="form-control bg-dark border-secondary text-light" value="{{ prop.min_level if prop else 1 }}"></div>
+<div class="col-md-4"><label class="form-label text-muted">Max Owned</label><input type="number" name="max_owned" class="form-control bg-dark border-secondary text-light" value="{{ prop.max_owned if prop else 1 }}"></div>
+</div>
+<div class="d-flex gap-2 mt-4"><button type="submit" class="btn-ma-primary flex-fill">{{ action|upper }}</button><a href="{{ url_for('admin.properties') }}" class="btn-ma-ghost flex-fill text-center">CANCEL</a></div>
+</form></div></div></div>
+{% endblock %}

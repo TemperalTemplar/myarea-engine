@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ player.display_name }}{% endblock %}
+{% block content %}
+{% set p = player %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="ma-card p-3 text-center">
+      <div style="width:96px;height:96px;border-radius:50%;background:var(--ma-surface-2);border:3px solid var(--ma-accent);display:inline-flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">
+        <i class="bi bi-person-fill"></i>
+      </div>
+      <div class="font-display" style="font-size:1.6rem;">{{ p.display_name }}</div>
+      {% if p.gang %}<div class="text-muted">[{{ p.gang.tag }}] {{ p.gang.name }}</div>{% endif %}
+      <div class="mt-2 d-flex justify-content-center gap-2">
+        <span class="badge" style="background:var(--ma-accent);">LEVEL {{ p.level }}</span>
+        <span class="badge bg-secondary">{{ p.crime_points }} CP</span>
+      </div>
+    </div>
+    <div class="ma-card p-3 mt-3">
+      <div class="ma-card-header mb-3">COMBAT STATS</div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted">Attack</span><span class="text-accent">{{ p.attack_power }}</span></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted">Defense</span><span class="text-teal">{{ p.defense_power }}</span></div>
+      <div class="d-flex justify-content-between mb-2"><span class="text-muted">Fights Won</span><span class="text-gold">{{ p.fights_won }}</span></div>
+      <div class="d-flex justify-content-between"><span class="text-muted">Fights Lost</span><span class="text-danger">{{ p.fights_lost }}</span></div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="ma-card p-3 mb-3">
+      <div class="ma-card-header mb-3">STATS</div>
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="text-muted mb-1" style="font-size:0.75rem;">ENERGY</div>
+          <div class="ma-stat-bar energy mb-1"><div class="fill" style="width:{{ [(p.energy/p.energy_max*100)|int,100]|min }}%"></div></div>
+          <small>{{ p.energy }}/{{ p.energy_max }}</small>
+        </div>
+        <div class="col-6">
+          <div class="text-muted mb-1" style="font-size:0.75rem;">STAMINA</div>
+          <div class="ma-stat-bar stamina mb-1"><div class="fill" style="width:{{ [(p.stamina/p.stamina_max*100)|int,100]|min }}%"></div></div>
+          <small>{{ p.stamina }}/{{ p.stamina_max }}</small>
+        </div>
+        <div class="col-6">
+          <div class="text-muted mb-1" style="font-size:0.75rem;">HEALTH</div>
+          <div class="ma-stat-bar health mb-1"><div class="fill" style="width:{{ [(p.health/p.health_max*100)|int,100]|min }}%"></div></div>
+          <small>{{ p.health }}/{{ p.health_max }}</small>
+        </div>
+        <div class="col-6">
+          <div class="text-muted mb-1" style="font-size:0.75rem;">CASH ON HAND</div>
+          <div class="text-info font-display" style="font-size:1.2rem;">${{ "{:,}".format(p.cash) }}</div>
+        </div>
+      </div>
+    </div>
+    {% if p.properties %}
+    <div class="ma-card p-3">
+      <div class="ma-card-header mb-3">PROPERTIES ({{ p.properties|length }})</div>
+      {% for prop in p.properties %}
+      <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--ma-border);font-size:0.82rem;">
+        <span>{{ prop.template.name }}</span>
+        <span class="text-gold">${{ "{:,}".format(prop.template.income_per_hour) }}/hr</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

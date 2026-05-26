@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% block title %}Notify All — Admin{% endblock %}
+{% block admin_content %}
+<div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-megaphone-fill text-accent"></i> NOTIFY ALL PLAYERS</div>
+<div class="row justify-content-start">
+  <div class="col-lg-6">
+    <div class="ma-card p-4">
+      <p class="text-muted mb-3">Sends a notification to every player in the game.</p>
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label class="form-label text-muted">Title</label>
+          <input type="text" name="title" class="form-control bg-dark border-secondary text-light" required maxlength="128">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted">Message</label>
+          <textarea name="message" class="form-control bg-dark border-secondary text-light" rows="4" required></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="form-label text-muted">Link (optional)</label>
+          <input type="text" name="link" class="form-control bg-dark border-secondary text-light" placeholder="/game/dashboard">
+        </div>
+        <button type="submit" class="btn-ma-primary w-100"
+          data-confirm="Send to ALL players?">SEND TO ALL</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+/* ─── MyArea Game Engine — Core Styles ──────────────────────
+   Aesthetic: Dark city streets, neon-tinged, industrial grit
+   Fonts: Bebas Neue (headers) + DM Mono (body/stats)
+   ─────────────────────────────────────────────────────────── */
+
+:root {
+  --ma-bg:          #0d0f12;
+  --ma-surface:     #13171d;
+  --ma-surface-2:   #1c2029;
+  --ma-border:      #2a3040;
+  --ma-accent:      #e63946;      /* blood red */
+  --ma-accent-2:    #f4a261;      /* dirty gold */
+  --ma-accent-3:    #2ec4b6;      /* neon teal */
+  --ma-text:        #c8cdd6;
+  --ma-text-muted:  #5c6470;
+  --ma-energy:      #f4c430;
+  --ma-stamina:     #e63946;
+  --ma-health:      #2ec4b6;
+  --ma-cash:        #7ec8e3;
+  --ma-font-display: 'Bebas Neue', sans-serif;
+  --ma-font-body:    'DM Mono', monospace;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body.myarea-body {
+  background-color: var(--ma-bg);
+  color: var(--ma-text);
+  font-family: var(--ma-font-body);
+  font-size: 0.875rem;
+  min-height: 100vh;
+  /* Subtle noise texture */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4, h5, h6,
+.display-1, .display-2, .display-3 {
+  font-family: var(--ma-font-display);
+  letter-spacing: 0.04em;
+  color: #e8ecf0;
+}
+
+a { color: var(--ma-accent-2); text-decoration: none; }
+a:hover { color: #fff; }
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.myarea-nav {
+  background: rgba(13, 15, 18, 0.95);
+  border-bottom: 1px solid var(--ma-border);
+  backdrop-filter: blur(8px);
+}
+
+.myarea-brand {
+  font-family: var(--ma-font-display);
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  color: #fff !important;
+  line-height: 1;
+}
+.myarea-brand .brand-accent { color: var(--ma-accent); }
+
+.myarea-statbar { gap: 0.5rem; }
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--ma-surface);
+  border: 1px solid var(--ma-border);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  font-family: var(--ma-font-body);
+  white-space: nowrap;
+  transition: border-color 0.2s;
+}
+.stat-pill:hover { border-color: var(--ma-accent); }
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.card, .ma-card {
+  background: var(--ma-surface);
+  border: 1px solid var(--ma-border);
+  border-radius: 6px;
+}
+
+.ma-card-header {
+  font-family: var(--ma-font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--ma-border);
+  background: var(--ma-surface-2);
+}
+
+.ma-card-accent {
+  border-left: 3px solid var(--ma-accent);
+}
+
+/* ── Stat bars (energy/stamina/health) ─────────────────────── */
+.ma-stat-bar { height: 8px; border-radius: 4px; background: var(--ma-surface-2); overflow: hidden; }
+.ma-stat-bar .fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.ma-stat-bar.energy .fill  { background: var(--ma-energy); }
+.ma-stat-bar.stamina .fill { background: var(--ma-stamina); }
+.ma-stat-bar.health .fill  { background: var(--ma-health); }
+.ma-stat-bar.xp .fill      { background: var(--ma-accent-2); }
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn-ma-primary {
+  background: var(--ma-accent);
+  color: #fff;
+  border: none;
+  font-family: var(--ma-font-display);
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 4px;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-ma-primary:hover  { background: #c1121f; color: #fff; transform: translateY(-1px); }
+.btn-ma-primary:active { transform: translateY(0); }
+
+.btn-ma-gold {
+  background: var(--ma-accent-2);
+  color: #1a1a1a;
+  border: none;
+  font-family: var(--ma-font-display);
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 4px;
+}
+.btn-ma-gold:hover { background: #e09040; color: #111; }
+
+.btn-ma-ghost {
+  background: transparent;
+  color: var(--ma-text);
+  border: 1px solid var(--ma-border);
+  font-family: var(--ma-font-body);
+  border-radius: 4px;
+  padding: 0.35rem 1rem;
+  transition: border-color 0.15s;
+}
+.btn-ma-ghost:hover { border-color: var(--ma-accent); color: #fff; }
+
+/* ── Tables ────────────────────────────────────────────────── */
+.ma-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.ma-table th {
+  font-family: var(--ma-font-display);
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--ma-text-muted);
+  border-bottom: 1px solid var(--ma-border);
+  padding: 0.5rem 0.75rem;
+}
+.ma-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(42,48,64,0.5);
+  vertical-align: middle;
+}
+.ma-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── Rarity colors ─────────────────────────────────────────── */
+.rarity-common    { color: #9ca3af; }
+.rarity-uncommon  { color: #4ade80; }
+.rarity-rare      { color: #60a5fa; }
+.rarity-epic      { color: #c084fc; }
+.rarity-legendary { color: var(--ma-accent-2); text-shadow: 0 0 8px var(--ma-accent-2); }
+
+/* ── Notifications toast ───────────────────────────────────── */
+#notif-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 320px;
+}
+
+.ma-toast {
+  background: var(--ma-surface-2);
+  border: 1px solid var(--ma-border);
+  border-left: 3px solid var(--ma-accent);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  animation: slideInRight 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; pointer-events: none; }
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.myarea-footer {
+  background: var(--ma-surface);
+  border-top: 1px solid var(--ma-border);
+  font-size: 0.75rem;
+}
+
+/* ── HTMX loading indicator ────────────────────────────────── */
+.htmx-indicator { opacity: 0; transition: opacity 200ms; }
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator { opacity: 1; }
+
+/* ── Misc utilities ────────────────────────────────────────── */
+.text-accent   { color: var(--ma-accent) !important; }
+.text-gold     { color: var(--ma-accent-2) !important; }
+.text-teal     { color: var(--ma-accent-3) !important; }
+.bg-ma-surface { background: var(--ma-surface) !important; }
+.border-ma     { border-color: var(--ma-border) !important; }
+.font-display  { font-family: var(--ma-font-display) !important; letter-spacing: 0.05em; }

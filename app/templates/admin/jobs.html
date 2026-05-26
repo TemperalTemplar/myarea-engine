@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block title %}Jobs — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;"><i class="bi bi-briefcase-fill text-warning"></i> JOB TEMPLATES</div>
+  <a href="{{ url_for('admin.job_new') }}" class="btn-ma-primary"><i class="bi bi-plus-lg"></i> NEW JOB</a>
+</div>
+<div class="ma-card">
+  <table class="ma-table">
+    <thead><tr><th>Name</th><th>Category</th><th>Lv</th><th>Energy</th><th>Cash Range</th><th>XP</th><th>Success%</th><th>Jail</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td>{{ job.name }}</td>
+        <td><span class="badge bg-secondary">{{ job.category }}</span></td>
+        <td>{{ job.min_level }}</td>
+        <td class="text-warning">{{ job.energy_cost }}</td>
+        <td class="text-info" style="font-size:0.75rem;">${{ "{:,}".format(job.cash_min) }}–${{ "{:,}".format(job.cash_max) }}</td>
+        <td class="text-gold">{{ job.xp_reward }}</td>
+        <td class="text-success">{{ (job.base_success_rate*100)|int }}%</td>
+        <td class="text-muted" style="font-size:0.75rem;">{{ job.jail_time_seconds }}s</td>
+        <td>{% if job.is_active %}<span class="badge bg-success">ON</span>{% else %}<span class="badge bg-secondary">OFF</span>{% endif %}</td>
+        <td>
+          <div class="d-flex gap-1">
+            <a href="{{ url_for('admin.job_edit', job_id=job.id) }}" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;">EDIT</a>
+            <form method="POST" action="{{ url_for('admin.toggle_job', job_id=job.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;">{{ 'OFF' if job.is_active else 'ON' }}</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.job_delete', job_id=job.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;color:var(--ma-accent);"
+                data-confirm="Delete job '{{ job.name }}'?">DEL</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

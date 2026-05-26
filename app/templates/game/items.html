@@ -1,0 +1,107 @@
+{% extends "layouts/base.html" %}
+{% block title %}Items{% endblock %}
+{% block content %}
+{% set p = current_user.player %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-bag-fill text-teal"></i> ITEMS</div>
+
+    {% if p.inventory %}
+    <div class="ma-card mb-4">
+      <div class="ma-card-header">YOUR INVENTORY</div>
+      <table class="ma-table">
+        <thead><tr><th>Item</th><th>Type</th><th>Rarity</th><th>Qty</th><th>Bonuses</th><th></th></tr></thead>
+        <tbody>
+          {% for pi in p.inventory %}
+          <tr>
+            <td>{{ pi.item.name }}</td>
+            <td><span class="badge bg-secondary">{{ pi.item.category|upper }}</span></td>
+            <td><span class="rarity-{{ pi.item.rarity }}">{{ pi.item.rarity|upper }}</span></td>
+            <td>{{ pi.quantity }}</td>
+            <td style="font-size:0.75rem;">
+              {% if pi.item.attack_bonus %}<span class="text-accent">ATK+{{ pi.item.attack_bonus }}</span> {% endif %}
+              {% if pi.item.defense_bonus %}<span class="text-teal">DEF+{{ pi.item.defense_bonus }}</span> {% endif %}
+              {% if pi.item.health_restore %}<span class="text-success">HP+{{ pi.item.health_restore }}</span> {% endif %}
+              {% if pi.item.energy_restore %}<span class="text-warning">EN+{{ pi.item.energy_restore }}</span> {% endif %}
+            </td>
+            <td class="d-flex gap-1">
+              {% if pi.item.is_consumable %}
+              <form method="POST" action="/game/items/use/{{ pi.item_id }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-ma-primary" style="padding:0.15rem 0.6rem;font-size:0.78rem;">USE</button>
+              </form>
+              {% elif not pi.item.is_consumable %}
+              <form method="POST" action="/game/items/equip/{{ pi.item_id }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="{{ 'btn-ma-gold' if pi.equipped else 'btn-ma-ghost' }}" style="padding:0.15rem 0.6rem;font-size:0.78rem;">
+                  {{ 'UNEQUIP' if pi.equipped else 'EQUIP' }}
+                </button>
+              </form>
+              {% endif %}
+              {% if pi.item.sell_price %}
+              <form method="POST" action="/game/items/sell/{{ pi.item_id }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.6rem;font-size:0.78rem;">SELL</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <div class="font-display mb-2" style="font-size:1.3rem;">SHOP</div>
+    {% set categories = shop_items|map(attribute='category')|unique|list %}
+    {% for cat in categories %}
+    <div class="ma-card-header mb-2">{{ cat|upper }}</div>
+    <div class="row g-2 mb-3">
+      {% for item in shop_items if item.category == cat %}
+      <div class="col-md-4">
+        <div class="ma-card p-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="font-display" style="font-size:1rem;">{{ item.name }}</span>
+            <span class="rarity-{{ item.rarity }}" style="font-size:0.7rem;">{{ item.rarity|upper }}</span>
+          </div>
+          <div style="font-size:0.75rem;" class="mb-2">
+            {% if item.attack_bonus %}<div class="text-accent">ATK +{{ item.attack_bonus }}</div>{% endif %}
+            {% if item.defense_bonus %}<div class="text-teal">DEF +{{ item.defense_bonus }}</div>{% endif %}
+            {% if item.health_restore %}<div class="text-success">Restores {{ item.health_restore }} HP</div>{% endif %}
+            {% if item.energy_restore %}<div class="text-warning">Restores {{ item.energy_restore }} Energy</div>{% endif %}
+            {% if item.stamina_restore %}<div class="text-danger">Restores {{ item.stamina_restore }} Stamina</div>{% endif %}
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-info">${{ "{:,}".format(item.buy_price) }}</span>
+            {% set owned = inventory.get(item.id) %}
+            {% if p.cash >= item.buy_price %}
+            <form method="POST" action="/game/items/buy/{{ item.id }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-primary" style="padding:0.2rem 0.7rem;font-size:0.82rem;">
+                BUY{% if owned %} ({{ owned.quantity }}){% endif %}
+              </button>
+            </form>
+            {% else %}
+            <button class="btn-ma-ghost" style="padding:0.2rem 0.7rem;font-size:0.82rem;" disabled>CAN'T AFFORD</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="ma-card p-3">
+      <div class="ma-card-header mb-2">YOUR STATS</div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Cash</span><span class="text-info">${{ "{:,}".format(p.cash) }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Attack</span><span class="text-accent">{{ p.attack_power }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Defense</span><span class="text-teal">{{ p.defense_power }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Max Health</span><span class="text-success">{{ p.health_max }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Max Energy</span><span class="text-warning">{{ p.energy_max }}</span></div>
+      <div class="d-flex justify-content-between"><span class="text-muted">Max Stamina</span><span class="text-danger">{{ p.stamina_max }}</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

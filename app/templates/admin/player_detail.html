@@ -1,0 +1,111 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ player.display_name }} — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;">{{ player.display_name }}</div>
+  <a href="{{ url_for('admin.players') }}" class="text-muted" style="font-size:0.82rem;">← Back</a>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="ma-card p-3 mb-3">
+      <div class="ma-card-header mb-3">ACCOUNT</div>
+      <div class="mb-1"><span class="text-muted">Username:</span> {{ player.user.username }}</div>
+      <div class="mb-1"><span class="text-muted">Email:</span> {{ player.user.email }}</div>
+      <div class="mb-1"><span class="text-muted">Joined:</span> {{ player.created_at.strftime('%Y-%m-%d') }}</div>
+      <div class="mb-3"><span class="text-muted">Last Active:</span> {{ player.last_active.strftime('%Y-%m-%d %H:%M') }}</div>
+      <div class="mb-3">
+        Status: {% if player.user.is_banned %}<span class="badge bg-danger">BANNED</span>{% else %}<span class="badge bg-success">ACTIVE</span>{% endif %}
+      </div>
+      <form method="POST" action="{{ url_for('admin.ban_player', player_id=player.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-ma-primary w-100" style="font-size:0.82rem;"
+          data-confirm="{{ 'Unban' if player.user.is_banned else 'Ban' }} {{ player.display_name }}?">
+          {{ 'UNBAN' if player.user.is_banned else 'BAN' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="ma-card p-3">
+      <div class="ma-card-header mb-3">EDIT STATS</div>
+      <form method="POST" action="{{ url_for('admin.edit_player', player_id=player.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% for field, label, val in [
+          ('cash',   'Cash',   player.cash),
+          ('level',  'Level',  player.level),
+          ('energy', 'Energy', player.energy),
+          ('health', 'Health', player.health),
+        ] %}
+        <div class="mb-2">
+          <label class="form-label text-muted" style="font-size:0.75rem;">{{ label }}</label>
+          <input type="number" name="{{ field }}" value="{{ val }}"
+            class="form-control form-control-sm bg-dark border-secondary text-light">
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-ma-gold w-100 mt-2"
+          data-confirm="Edit {{ player.display_name }}'s stats?">SAVE CHANGES</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="ma-card p-3 mb-3">
+      <div class="ma-card-header mb-2">GAME STATS</div>
+      <div class="row g-2" style="font-size:0.82rem;">
+        {% for label, val, color in [
+          ('Level', player.level, 'text-accent'),
+          ('XP', "{:,}".format(player.experience), 'text-muted'),
+          ('Cash', '$'+"{:,}".format(player.cash), 'text-info'),
+          ('Bank', '$'+"{:,}".format(player.bank), 'text-teal'),
+          ('Attack', player.attack_power, 'text-accent'),
+          ('Defense', player.defense_power, 'text-teal'),
+          ('Fights Won', player.fights_won, 'text-gold'),
+          ('Fights Lost', player.fights_lost, 'text-danger'),
+          ('Crime Points', player.crime_points, 'text-teal'),
+          ('Gang', '['+player.gang.tag+'] '+player.gang.name if player.gang else '—', 'text-gold'),
+        ] %}
+        <div class="col-6 col-md-4">
+          <div class="text-muted" style="font-size:0.7rem;">{{ label }}</div>
+          <div class="{{ color }}">{{ val }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="ma-card">
+          <div class="ma-card-header">RECENT JOBS</div>
+          <div class="p-2">
+            {% for log in recent_jobs %}
+            <div class="d-flex justify-content-between py-1" style="border-bottom:1px solid var(--ma-border);font-size:0.75rem;">
+              <span>{{ log.job.name }}</span>
+              {% if log.jailed %}<span class="text-danger">JAILED</span>
+              {% elif log.success %}<span class="text-success">+${{ "{:,}".format(log.cash_earned) }}</span>
+              {% else %}<span class="text-muted">FAILED</span>{% endif %}
+            </div>
+            {% else %}<div class="text-muted text-center py-2" style="font-size:0.75rem;">No jobs.</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="ma-card">
+          <div class="ma-card-header">RECENT ATTACKS</div>
+          <div class="p-2">
+            {% for log in recent_attacks %}
+            <div class="py-1" style="border-bottom:1px solid var(--ma-border);font-size:0.75rem;">
+              {% if log.attacker_id == player.id %}
+              vs {{ log.defender.display_name }}
+              <span class="{{ 'text-success' if log.attacker_won else 'text-danger' }}">{{ 'W' if log.attacker_won else 'L' }}</span>
+              {% else %}
+              by {{ log.attacker.display_name }}
+              <span class="{{ 'text-danger' if log.attacker_won else 'text-success' }}">{{ 'L' if log.attacker_won else 'D' }}</span>
+              {% endif %}
+            </div>
+            {% else %}<div class="text-muted text-center py-2" style="font-size:0.75rem;">No attacks.</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

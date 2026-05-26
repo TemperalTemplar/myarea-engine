@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% block title %}Properties — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;"><i class="bi bi-building-fill text-gold"></i> PROPERTIES</div>
+  <a href="{{ url_for('admin.property_new') }}" class="btn-ma-primary"><i class="bi bi-plus-lg"></i> NEW PROPERTY</a>
+</div>
+<div class="ma-card">
+  <table class="ma-table">
+    <thead><tr><th>Name</th><th>Type</th><th>Lv</th><th>Buy</th><th>Sell</th><th>Income/hr</th><th>Bonuses</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for prop in props %}
+      <tr>
+        <td>{{ prop.name }}</td>
+        <td><span class="badge bg-secondary">{{ prop.category }}</span></td>
+        <td>{{ prop.min_level }}</td>
+        <td class="text-info" style="font-size:0.75rem;">${{ "{:,}".format(prop.purchase_price) }}</td>
+        <td class="text-muted" style="font-size:0.75rem;">${{ "{:,}".format(prop.sell_price) }}</td>
+        <td class="text-gold">${{ "{:,}".format(prop.income_per_hour) }}</td>
+        <td style="font-size:0.75rem;">
+          {% if prop.attack_bonus %}<span class="text-accent">ATK+{{ prop.attack_bonus }}</span> {% endif %}
+          {% if prop.defense_bonus %}<span class="text-teal">DEF+{{ prop.defense_bonus }}</span> {% endif %}
+          {% if prop.energy_bonus %}<span class="text-warning">EN+{{ prop.energy_bonus }}</span> {% endif %}
+          {% if not prop.attack_bonus and not prop.defense_bonus and not prop.energy_bonus %}—{% endif %}
+        </td>
+        <td>{% if prop.is_active %}<span class="badge bg-success">ON</span>{% else %}<span class="badge bg-secondary">OFF</span>{% endif %}</td>
+        <td>
+          <div class="d-flex gap-1">
+            <a href="{{ url_for('admin.property_edit', prop_id=prop.id) }}" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;">EDIT</a>
+            <form method="POST" action="{{ url_for('admin.toggle_property', prop_id=prop.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;">{{ 'OFF' if prop.is_active else 'ON' }}</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.property_delete', prop_id=prop.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-ma-ghost" style="padding:0.15rem 0.5rem;font-size:0.75rem;color:var(--ma-accent);"
+                data-confirm="Delete '{{ prop.name }}'?">DEL</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

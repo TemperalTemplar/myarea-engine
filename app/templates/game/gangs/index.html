@@ -1,0 +1,51 @@
+{% extends "layouts/base.html" %}
+{% block title %}Gangs{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;"><i class="bi bi-shield-fill text-accent"></i> GANGS</div>
+  {% if not player.gang_id %}
+  <a href="{{ url_for('gangs.create') }}" class="btn-ma-primary">+ CREATE GANG</a>
+  {% else %}
+  <a href="{{ url_for('gangs.view', slug=player.gang.slug) }}" class="btn-ma-gold">MY GANG →</a>
+  {% endif %}
+</div>
+
+{% if gangs %}
+<div class="ma-card">
+  <table class="ma-table">
+    <thead>
+      <tr><th>Gang</th><th>Tag</th><th>Leader</th><th>Members</th><th>Territory</th><th>Bank</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for gang in gangs %}
+      <tr>
+        <td><a href="{{ url_for('gangs.view', slug=gang.slug) }}" class="text-gold">{{ gang.name }}</a></td>
+        <td><span class="badge" style="background:var(--ma-accent);">[{{ gang.tag }}]</span></td>
+        <td class="text-muted">{{ gang.leader.display_name if gang.leader else '—' }}</td>
+        <td>{{ gang.member_count }}<span class="text-muted">/50</span></td>
+        <td class="text-teal">{{ gang.territory_points }} pts</td>
+        <td class="text-gold">${{ "{:,}".format(gang.bank) }}</td>
+        <td>
+          {% if not player.gang_id %}
+          <form method="POST" action="{{ url_for('gangs.join', slug=gang.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-ma-ghost" style="padding:0.2rem 0.6rem;font-size:0.78rem;">JOIN</button>
+          </form>
+          {% elif player.gang_id == gang.id %}
+          <span class="text-gold" style="font-size:0.78rem;">YOUR GANG</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="ma-card p-4 text-center">
+  <div class="text-muted mb-3">No gangs exist yet. Be the first to form one.</div>
+  {% if not player.gang_id and player.level >= 5 %}
+  <a href="{{ url_for('gangs.create') }}" class="btn-ma-primary">CREATE THE FIRST GANG</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layouts/base.html" %}
+{% block title %}Edit {{ gang.name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="font-display mb-3" style="font-size:2rem;">EDIT [{{ gang.tag }}] {{ gang.name }}</div>
+    <div class="ma-card p-4">
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-4">
+          <label class="form-label text-muted">Description</label>
+          <textarea name="description" class="form-control bg-dark border-secondary text-light"
+            rows="4" maxlength="500">{{ gang.description or '' }}</textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn-ma-primary flex-fill">SAVE</button>
+          <a href="{{ url_for('gangs.view', slug=gang.slug) }}" class="btn-ma-ghost flex-fill text-center">CANCEL</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

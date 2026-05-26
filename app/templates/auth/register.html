@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="ma-card p-4">
+      <div class="ma-card-header mb-4 text-center" style="border:none;background:none;">
+        <span style="font-family:var(--ma-font-display);font-size:2rem;">JOIN MY<span class="text-accent">AREA</span></span>
+        <div class="text-muted mt-1" style="font-size:0.8rem;">START YOUR CRIMINAL CAREER</div>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }} py-2">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label class="form-label text-muted">Username</label>
+          <input type="text" name="username" class="form-control bg-dark border-secondary text-light" value="{{ username|default('') }}" required autofocus>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted">Email</label>
+          <input type="email" name="email" class="form-control bg-dark border-secondary text-light" value="{{ email|default('') }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-muted">Password</label>
+          <input type="password" name="password" class="form-control bg-dark border-secondary text-light" required>
+        </div>
+        <div class="mb-4">
+          <label class="form-label text-muted">Confirm Password</label>
+          <input type="password" name="password2" class="form-control bg-dark border-secondary text-light" required>
+        </div>
+        <button type="submit" class="btn-ma-primary w-100">CREATE CHARACTER</button>
+      </form>
+      <div class="text-center mt-3">
+        <small class="text-muted">Already playing? <a href="{{ url_for('auth.login') }}" class="text-gold">Login</a></small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

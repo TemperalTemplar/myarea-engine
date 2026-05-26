@@ -1,0 +1,65 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin{% endblock %}
+{% block admin_content %}
+<div class="font-display mb-3" style="font-size:2rem;"><i class="bi bi-speedometer2 text-accent"></i> GAME ADMIN</div>
+
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('people-fill',      'Players',       stats.players,       'text-info'),
+    ('person-x-fill',    'Banned',        stats.banned,        'text-danger'),
+    ('shield-fill',      'Gangs',         stats.gangs,         'text-accent'),
+    ('briefcase-fill',   'Jobs Today',    stats.jobs_today,    'text-warning'),
+    ('crosshair',        'Attacks Today', stats.attacks_today, 'text-danger'),
+    ('bag-fill',         'Items',         stats.items,         'text-teal'),
+  ] %}
+  {% for icon, label, value, color in cards %}
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="ma-card p-3 text-center">
+      <i class="bi bi-{{ icon }} {{ color }}" style="font-size:1.5rem;"></i>
+      <div class="font-display {{ color }}" style="font-size:1.6rem;">{{ value }}</div>
+      <div class="text-muted" style="font-size:0.72rem;">{{ label }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="ma-card">
+      <div class="ma-card-header">RECENT PLAYERS</div>
+      <table class="ma-table">
+        <thead><tr><th>Player</th><th>Level</th><th>Joined</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for p in recent %}
+          <tr>
+            <td><a href="{{ url_for('admin.player_detail', player_id=p.id) }}" class="text-gold">{{ p.display_name }}</a></td>
+            <td><span class="badge" style="background:var(--ma-accent);">{{ p.level }}</span></td>
+            <td class="text-muted" style="font-size:0.75rem;">{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>{% if p.user.is_banned %}<span class="badge bg-danger">BANNED</span>{% else %}<span class="badge bg-success">ACTIVE</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="ma-card">
+      <div class="ma-card-header">TOP PLAYERS</div>
+      <table class="ma-table">
+        <thead><tr><th>#</th><th>Player</th><th>Level</th><th>Gang</th><th>Wins</th></tr></thead>
+        <tbody>
+          {% for p in top %}
+          <tr>
+            <td class="text-muted">{{ loop.index }}</td>
+            <td><a href="{{ url_for('admin.player_detail', player_id=p.id) }}" class="text-gold">{{ p.display_name }}</a></td>
+            <td><span class="badge" style="background:var(--ma-accent);">{{ p.level }}</span></td>
+            <td class="text-muted">{{ '['+p.gang.tag+']' if p.gang else '—' }}</td>
+            <td class="text-gold">{{ p.fights_won }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

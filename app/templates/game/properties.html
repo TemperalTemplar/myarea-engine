@@ -1,0 +1,76 @@
+{% extends "layouts/base.html" %}
+{% block title %}Properties{% endblock %}
+{% block content %}
+{% set p = current_user.player %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;"><i class="bi bi-building-fill text-gold"></i> PROPERTIES</div>
+  {% if p.properties %}
+  <form method="POST" action="/game/properties/collect">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn-ma-gold">
+      <i class="bi bi-cash-stack"></i> COLLECT ALL INCOME
+    </button>
+  </form>
+  {% endif %}
+</div>
+
+{% if p.properties %}
+<div class="ma-card mb-4">
+  <div class="ma-card-header">YOUR PROPERTIES</div>
+  <table class="ma-table">
+    <thead><tr><th>Property</th><th>Type</th><th>Income/hr</th><th>Pending</th><th>Total Earned</th><th></th></tr></thead>
+    <tbody>
+      {% for prop in p.properties %}
+      <tr>
+        <td>{{ prop.template.name }}</td>
+        <td><span class="badge bg-secondary">{{ prop.template.category|upper }}</span></td>
+        <td class="text-gold">${{ "{:,}".format(prop.template.income_per_hour) }}</td>
+        <td class="text-teal">${{ "{:,}".format(prop.pending_income) }}</td>
+        <td class="text-muted">${{ "{:,}".format(prop.income_collected) }}</td>
+        <td>
+          <form method="POST" action="/game/properties/sell/{{ prop.id }}"
+            data-confirm="Sell {{ prop.template.name }} for ${{ '{:,}'.format(prop.template.sell_price) }}?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-ma-ghost" style="padding:0.2rem 0.6rem;font-size:0.78rem;">SELL</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="font-display mb-2" style="font-size:1.3rem;">AVAILABLE TO BUY</div>
+<div class="row g-2">
+  {% for tmpl in templates %}
+  {% set own_count = owned.get(tmpl.id) %}
+  <div class="col-md-4">
+    <div class="ma-card p-3 {% if p.level < tmpl.min_level or p.cash < tmpl.purchase_price %}opacity-60{% endif %}">
+      <div class="font-display mb-1" style="font-size:1.1rem;">{{ tmpl.name }}</div>
+      <span class="badge bg-secondary mb-2">{{ tmpl.category|upper }}</span>
+      <div style="font-size:0.78rem;" class="mb-2">
+        <div class="d-flex justify-content-between"><span class="text-muted">Buy</span><span class="text-info">${{ "{:,}".format(tmpl.purchase_price) }}</span></div>
+        <div class="d-flex justify-content-between"><span class="text-muted">Sell</span><span class="text-muted">${{ "{:,}".format(tmpl.sell_price) }}</span></div>
+        <div class="d-flex justify-content-between"><span class="text-muted">Income/hr</span><span class="text-gold">${{ "{:,}".format(tmpl.income_per_hour) }}</span></div>
+        {% if tmpl.defense_bonus %}<div class="d-flex justify-content-between"><span class="text-muted">Defense</span><span class="text-teal">+{{ tmpl.defense_bonus }}</span></div>{% endif %}
+        {% if tmpl.attack_bonus %}<div class="d-flex justify-content-between"><span class="text-muted">Attack</span><span class="text-accent">+{{ tmpl.attack_bonus }}</span></div>{% endif %}
+        <div class="d-flex justify-content-between"><span class="text-muted">Min Level</span><span>{{ tmpl.min_level }}</span></div>
+      </div>
+      {% if own_count %}
+        <button class="btn-ma-ghost w-100" disabled>OWNED</button>
+      {% elif p.level < tmpl.min_level %}
+        <button class="btn-ma-ghost w-100" disabled>NEED LEVEL {{ tmpl.min_level }}</button>
+      {% elif p.cash < tmpl.purchase_price %}
+        <button class="btn-ma-ghost w-100" disabled>CAN'T AFFORD</button>
+      {% else %}
+        <form method="POST" action="/game/properties/buy/{{ tmpl.id }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-ma-gold w-100">BUY</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyArea{% endblock %} | MyArea</title>
+
+    <!-- Google Fonts: Bebas Neue (display) + DM Mono (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- MyArea custom CSS -->
+    <link href="{{ url_for('static', filename='css/myarea.css') }}" rel="stylesheet">
+
+    {% block head %}{% endblock %}
+</head>
+<body class="myarea-body">
+
+    <!-- ── Navbar ─────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg myarea-nav sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand myarea-brand" href="{{ url_for('game.dashboard') }}">
+                MY<span class="brand-accent">AREA</span>
+            </a>
+
+            {% if current_user.is_authenticated %}
+            <!-- Player quick-stats bar -->
+            <div class="d-none d-lg-flex align-items-center gap-3 mx-auto myarea-statbar">
+                <span class="stat-pill" title="Energy">
+                    <i class="bi bi-lightning-fill text-warning"></i>
+                    <span id="stat-energy">{{ current_user.player.energy }}</span>/{{ current_user.player.energy_max }}
+                </span>
+                <span class="stat-pill" title="Stamina">
+                    <i class="bi bi-shield-fill text-danger"></i>
+                    <span id="stat-stamina">{{ current_user.player.stamina }}</span>/{{ current_user.player.stamina_max }}
+                </span>
+                <span class="stat-pill" title="Health">
+                    <i class="bi bi-heart-fill text-success"></i>
+                    <span id="stat-health">{{ current_user.player.health }}</span>/{{ current_user.player.health_max }}
+                </span>
+                <span class="stat-pill" title="Cash">
+                    <i class="bi bi-cash-stack text-info"></i>
+                    $<span id="stat-cash">{{ "{:,}".format(current_user.player.cash) }}</span>
+                </span>
+                <span class="stat-pill" title="Level">
+                    <i class="bi bi-star-fill text-primary"></i>
+                    Lv {{ current_user.player.level }}
+                </span>
+            </div>
+            {% endif %}
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('game.dashboard') }}"><i class="bi bi-grid-fill"></i> Hub</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('jobs.index') if 'jobs' in blueprint_names else '#' }}"><i class="bi bi-briefcase-fill"></i> Jobs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('attacks.index') if 'attacks' in blueprint_names else '#' }}"><i class="bi bi-crosshair"></i> Attacks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('properties.index') if 'properties' in blueprint_names else '#' }}"><i class="bi bi-building-fill"></i> Properties</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('items.index') if 'items' in blueprint_names else '#' }}"><i class="bi bi-bag-fill"></i> Items</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('gangs.index') }}"><i class="bi bi-shield-fill"></i> Gangs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('game.leaderboard') }}"><i class="bi bi-trophy-fill"></i> Rankings</a></li>
+                    <!-- Notifications -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="#" id="notif-bell">
+                            <i class="bi bi-bell-fill"></i>
+                            <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('game.profile', slug=current_user.player.slug) }}">My Profile</a></li>
+                            {% if current_user.is_admin %}
+                            <li><a class="dropdown-item text-warning" href="/admin">Admin Panel</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger ms-2" href="{{ url_for('auth.register') }}">Join the Game</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Flash messages ─────────────────────────────────── -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container-fluid px-4 mt-2">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ── Main content ───────────────────────────────────── -->
+    <main class="container-fluid px-4 py-3">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ── Footer ────────────────────────────────────────── -->
+    <footer class="myarea-footer text-center py-3 mt-5">
+        <small class="text-muted">MyArea &copy; {{ now.year }} &nbsp;|&nbsp; <a href="#" class="text-muted">Rules</a> &nbsp;|&nbsp; <a href="#" class="text-muted">Support</a></small>
+    </footer>
+
+    <!-- ── Scripts ───────────────────────────────────────── -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/myarea.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

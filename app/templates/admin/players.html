@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+{% block title %}Players — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="font-display" style="font-size:2rem;"><i class="bi bi-people-fill text-info"></i> PLAYERS</div>
+  <form method="GET" class="d-flex gap-2">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search name…"
+      class="form-control form-control-sm bg-dark border-secondary text-light" style="width:200px;">
+    <button type="submit" class="btn-ma-ghost" style="padding:0.3rem 0.8rem;">Search</button>
+  </form>
+</div>
+<div class="ma-card">
+  <table class="ma-table">
+    <thead><tr><th>Player</th><th>Level</th><th>Gang</th><th>Cash</th><th>Wins</th><th>Joined</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for p in pagination.items %}
+      <tr>
+        <td><a href="{{ url_for('admin.player_detail', player_id=p.id) }}" class="text-gold">{{ p.display_name }}</a>
+          {% if p.user.is_admin %}<span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem;">ADMIN</span>{% endif %}
+        </td>
+        <td><span class="badge" style="background:var(--ma-accent);">{{ p.level }}</span></td>
+        <td class="text-muted">{{ '['+p.gang.tag+']' if p.gang else '—' }}</td>
+        <td class="text-info" style="font-size:0.78rem;">${{ "{:,}".format(p.cash) }}</td>
+        <td class="text-gold">{{ p.fights_won }}</td>
+        <td class="text-muted" style="font-size:0.75rem;">{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>{% if p.user.is_banned %}<span class="badge bg-danger">BANNED</span>{% else %}<span class="badge bg-success">ACTIVE</span>{% endif %}</td>
+        <td><a href="{{ url_for('admin.player_detail', player_id=p.id) }}" class="text-muted" style="font-size:0.75rem;">View →</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if pagination.pages > 1 %}
+  <div class="d-flex justify-content-center gap-2 p-3">
+    {% if pagination.has_prev %}<a href="?page={{ pagination.prev_num }}&q={{ q }}" class="btn-ma-ghost" style="padding:0.2rem 0.6rem;">←</a>{% endif %}
+    <span class="text-muted" style="padding:0.2rem 0.6rem;">{{ pagination.page }}/{{ pagination.pages }}</span>
+    {% if pagination.has_next %}<a href="?page={{ pagination.next_num }}&q={{ q }}" class="btn-ma-ghost" style="padding:0.2rem 0.6rem;">→</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
