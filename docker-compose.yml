@@ -56,6 +56,7 @@ services:
       - SERVICE_API_KEY=${SERVICE_API_KEY:-change-this-service-key}
       - SOCIAL_APP_URL=${SOCIAL_APP_URL:-http://myarea_social_web:5000}
       - PREFERRED_URL_SCHEME=${PREFERRED_URL_SCHEME:-https}
+      - PYTHONPATH=/app
     volumes:
       - ./app:/app/app
       - uploads:/app/uploads
@@ -86,6 +87,7 @@ services:
       - SERVICE_API_KEY=${SERVICE_API_KEY:-change-this-service-key}
       - SOCIAL_APP_URL=${SOCIAL_APP_URL:-http://myarea_social_web:5000}
       - PREFERRED_URL_SCHEME=${PREFERRED_URL_SCHEME:-https}
+      - PYTHONPATH=/app
     volumes:
       - ./app:/app/app
     depends_on:
@@ -113,6 +115,7 @@ services:
       - SERVICE_API_KEY=${SERVICE_API_KEY:-change-this-service-key}
       - SOCIAL_APP_URL=${SOCIAL_APP_URL:-http://myarea_social_web:5000}
       - PREFERRED_URL_SCHEME=${PREFERRED_URL_SCHEME:-https}
+      - PYTHONPATH=/app
     volumes:
       - ./app:/app/app
     depends_on:
