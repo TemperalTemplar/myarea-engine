@@ -1,0 +1,10 @@
+.env
+.env.*
+*.bak
+*.mountbak
+*.bellbak
+*.resolverbak
+*.oidcbak
+*.keyrotbak
+__pycache__/
+*.pyc
