@@ -68,6 +68,8 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('items.index') if 'items' in blueprint_names else '#' }}"><i class="bi bi-bag-fill"></i> Items</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('gangs.index') }}"><i class="bi bi-shield-fill"></i> Gangs</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('game.leaderboard') }}"><i class="bi bi-trophy-fill"></i> Rankings</a></li>
+                    <!-- Shared MyArea launcher mounts here (9-dot app switcher) -->
+                    <li class="nav-item d-flex align-items-center"><div class="ma-nav-right"></div></li>
                     <!-- Notifications -->
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="#" id="notif-bell">
@@ -126,6 +128,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/myarea.js') }}"></script>
+    <!-- 9-dot Launcher + notification bell (shared) -->
+    <script>window.MA_USER = "{{ current_user.oidc_sub if current_user.is_authenticated else '' }}";</script>
+    <script src="https://apps.wrds361.com/static/launcher.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
