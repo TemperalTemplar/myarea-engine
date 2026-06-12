@@ -4,7 +4,7 @@ All background game logic runs here.
 """
 
 from datetime import datetime, timezone
-from celery_worker.worker import worker
+from celery_worker.worker import worker, get_flask_app
 
 
 def now_utc():
@@ -17,7 +17,7 @@ def regen_energy(self):
     try:
         from app import create_app, db
         from app.models import Player
-        app = create_app("production")
+        app = get_flask_app()  # shared (no per-task pool)
         with app.app_context():
             now = now_utc()
             regen_secs = app.config["ENERGY_REGEN_SECONDS"]
@@ -48,7 +48,7 @@ def regen_stamina(self):
     try:
         from app import create_app, db
         from app.models import Player
-        app = create_app("production")
+        app = get_flask_app()  # shared (no per-task pool)
         with app.app_context():
             now = now_utc()
             regen_secs = app.config["STAMINA_REGEN_SECONDS"]
@@ -89,7 +89,7 @@ def hospital_release(self):
     try:
         from app import create_app, db
         from app.models import Player, Notification
-        app = create_app("production")
+        app = get_flask_app()  # shared (no per-task pool)
         with app.app_context():
             now = now_utc()
             patients = Player.query.filter(
@@ -132,7 +132,7 @@ def jail_release(self):
         from app import create_app, db
         from app.models import JobLog, Player, Notification
         from sqlalchemy import and_
-        app = create_app("production")
+        app = get_flask_app()  # shared (no per-task pool)
         with app.app_context():
             now = now_utc()
             # Find jailed logs that have expired
@@ -174,7 +174,7 @@ def daily_reset():
     """
     from app import create_app, db
     from app.models import Player, Gang
-    app = create_app("production")
+    app = get_flask_app()  # shared (no per-task pool)
     with app.app_context():
         # Give each gang territory bonus to leader's bank
         gangs = Gang.query.filter(Gang.territory_points > 0).all()
@@ -192,7 +192,7 @@ def refresh_leaderboard_cache():
     from app import create_app, cache
     from app.models import Player, Gang
     from sqlalchemy import desc
-    app = create_app("production")
+    app = get_flask_app()  # shared (no per-task pool)
     with app.app_context():
         # Top players by level/XP
         top_players = Player.query.order_by(

@@ -58,5 +58,16 @@ worker.conf.beat_schedule = {
     },
 }
 
-# Import tasks so Celery discovers them
+# Lazy shared Flask app — built once on first task use (avoids per-task
+# connection-pool leak AND avoids circular import at module load).
+_shared_app = None
+def get_flask_app():
+    global _shared_app
+    if _shared_app is None:
+        from app import create_app
+        _shared_app = create_app()
+    return _shared_app
+
+
+# Import tasks so Celery discovers them (AFTER get_flask_app is defined)
 from celery_worker import tasks  # noqa: F401, E402
