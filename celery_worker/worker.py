@@ -24,7 +24,7 @@ worker.conf.beat_schedule = {
     # Energy regeneration — every 5 minutes
     "regen-energy": {
         "task": "celery_worker.tasks.regen_energy",
-        "schedule": 300.0,
+        "schedule": 60.0,
     },
     # Stamina regeneration — every 3 minutes
     "regen-stamina": {
