@@ -33,7 +33,10 @@ def regen_energy(self):
                 if ticks > 0:
                     gain = min(ticks, player.energy_max - player.energy)
                     player.energy += gain
-                    player.energy_last_regen = now
+                    # Advance by exactly the ticks consumed (keep leftover seconds,
+                    # so regen is accurate and doesn't silently lose time).
+                    from datetime import timedelta as _td
+                    player.energy_last_regen = player.energy_last_regen + _td(seconds=ticks * regen_secs)
                     updated += 1
 
             db.session.commit()
